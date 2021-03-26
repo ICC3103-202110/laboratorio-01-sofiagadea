@@ -11,147 +11,148 @@ for i in range(1,3):
         
 for i in no:
     cards.insert(random.randint(1,pairs),i)
-    hidden.append(" * ")
+    hidden.append(" ¿? ")
 
-player_1 = 0
-player_2 = 0
+p1 = 0
+p2 = 0
 #Siempre 2 jugadores
 
-def ganar(player,card, hidden2,lista, coordenada1, coordenada2, player_1, player_2,pairs):
-    h = player
-    hidden2.remove(card)
-    hidden2.remove(card)
-    lista.remove(card)
-    lista.remove(card)
-    if h == 1 :
-        player_1 += 1
-    else:
-        player_2 += 1
+def ganar(player, card, hidden2, cards, pos, pos2, pos3, pos4, p1, p2, pairs, coordinates):
     
-    if len(lista) >= 2:
+    h = player
+    hidden2[pos, pos2] = "    "
+    hidden2[pos3,pos4] = "    "
+    cards = np.array(cards)
+    cards[pos, pos2] = 100
+    cards[pos3, pos4] = 100
+    if h == 1 :
+        p1 += 1
+    else:
+        p2 += 1
+    vacios = 0
+    for j in range(0,len(cards)):
+         for i in cards[j]:
+             if i == 100:
+                 vacios += 1
+    if vacios < pairs*2:
+        print("___________________________________________")
         print("")
         print("Cards are the same! Play again ")
         print("____________________")
         print("")
-        print(lista)
-        guessing(player, cards, hidden2, player_1, player_2,pairs)
+        guessing(hidden2, player, cards, p1, p2 ,pairs, coordinates)
+    
 
-    else:
+    elif vacios == pairs*2:
+        print("___________________________")
         print("The game is over")
-        if player_1 > player_2:
-            print("Player number 1 wins, with", player_1, "points")
-        elif player_1 == player_2:
-            print("Empataron")
+        if p1 > p2:
+            print("Player number 1 wins, with", p1, "points")
+        elif p1 == p2:
+            print("Dead Heat, both have the same points")
         else:
-            print("Player number 1 wins, with", player_2, "points")
+            print("Player number 1 wins, with", p2, "points")
 
-def table(player, cards, player_1, player_2, pairs, hidden):
-    coordinates = [" "]
-    coordinates2 = []
+def table(player, cards, p1, p2, pairs, hidden):
     if int(len(hidden)) % 10 == 0:
-        j = (np.array(hidden).reshape(10, int(len(hidden)/10)))
-        cards = (np.array(cards).reshape(10, int(len(cards)/10)))
-        for i in range(0,int(len(hidden)/10)):
-            k = str(i)
-            coordinates.append((" "+k)) 
-        print(coordinates)
-        for i in range(0,10):
-            k = str(i)
-            coordinates2.append((" "+k))     
-        j = np.insert(j,0,coordinates2, axis=1)
+        cards, j, coordinates = general(hidden, cards, 10)
     
     elif int(len(hidden)) % 8 == 0:
-        cards = (np.array(cards).reshape(8, int(len(cards)/8)))
-        j = (np.array(hidden).reshape(8, int(len(hidden)/8)))
-        for i in range(0,int(len(hidden)/8)):
-            k = str(i)
-            coordinates.append((" "+k)) 
-        print(coordinates)
-        for i in range(0,8):
-            k = str(i)
-            coordinates2.append((" "+k))     
-        j = np.insert(j,0,coordinates2, axis=1)
-     
+        cards, j, coordinates = general(hidden, cards, 8)
+        
     elif int(len(hidden)) % 6 == 0:
-        cards = (np.array(cards).reshape(6, int(len(cards)/6)))
-        j = (np.array(hidden).reshape(6, int(len(hidden)/6)))
-        for i in range(0,int(len(hidden)/6)):
-            k = str(i)
-            coordinates.append((" "+k)) 
-        print(coordinates)
-        for i in range(0,6):
-            k = str(i)
-            coordinates2.append((" "+k))     
-        j = np.insert(j,0,coordinates2, axis=1)
-    
+        cards, j, coordinates = general(hidden, cards, 6)
         
     elif int(len(hidden)) % 4 == 0:
-        cards = (np.array(cards).reshape(4, int(len(cards)/4)))
-        j = (np.array(hidden).reshape(4, int(len(hidden)/4)))
-        for i in range(0,int(len(hidden)/4)):
-            k = str(i)
-            coordinates.append((" "+k)) 
-        print(coordinates)
-        for i in range(0,4):
-            k = str(i)
-            coordinates2.append((" "+k))     
-        j = np.insert(j,0,coordinates2, axis=1)
-    
+        cards, j, coordinates = general(hidden, cards, 4)
 
     else:
-        j = (np.array(hidden).reshape(2, int(len(hidden)/2)))
-        for i in range(0,int(len(hidden)/2)):
-            k = str(i)
-            coordinates.append((" "+k)) 
-        print(coordinates)
-        for i in range(0,2):
-            k = str(i)
-            coordinates2.append((" "+k))     
-        j = np.insert(j,0,coordinates2, axis=1)
+        general(hidden, cards, 2)
+        cards, j, coordinates = general(hidden, cards, 2) 
+    guessing(j, player, cards, p1, p2 ,pairs, coordinates)
 
-    guessing(j,1 , cards,player_1, player_2, pairs)
+def general(hidden,cards, divisor):    #La primera columna de las cartas no cuenta
+        coordinates = ["  "]
+        coordinates2 = []
 
+        cards = (np.array(cards).reshape(divisor, int(len(cards)/divisor)))
+        j = (np.array(hidden).reshape(divisor, int(len(hidden)/divisor)))         
+        for i in range(1,int(len(hidden)/divisor)+1):
+            k = str(i)
+            coordinates.append(("  "+k)) 
         
+        for i in range(0,divisor):
+            k = str(i)
+            coordinates2.append((k+"|"))     
+        j = np.insert(j, 0,coordinates2, axis=1) 
+        
+        cards = np.array(cards)
+        a = cards[:,0]
+        cards = np.insert(cards, ((int(len(hidden)/divisor))), a , axis=1)
+        i = 0
+        for i in range(0,len(cards[0])):
+            cards[0:i] = "null"
+
+        return cards,j,coordinates
+    
       
-    
+
         
 
-def guessing(j, player, cards, player_1, player_2,pairs):
-    hidden2 = j
-    print(j)
+def guessing(hidden2, player, cards, p1, p2 ,pairs, coordinates):
+    print(coordinates)
+    print(hidden2)
+
     print("The first digit is for rows, the second for columns")
-    position = (input("Choose a position for the first card (ex. (1,1) or (2,1)): "))
-    print("You've selected number", cards[position])
-    hidden2.pop(position)
-    hidden2.insert(position, cards[position]) 
+    pos = int(input("Choose a position for the row of the first card: "))
+    pos2 =int(input("Choose a position for the column of the first card: " ))
+    while pos > int(len(cards)):
+        print("No se puede usar ese numero, trate otra vez.")
+        pos = int(input("Choose a position for the row of the first card: "))
+    while pos2 > int(len(cards[0])):
+        print("No se puede usar ese numero, trate otra vez.")
+        pos2 =int(input("Choose a position for the column of the first card: " ))
+    print("You've selected number", cards[pos,pos2])
+    hidden2[pos,pos2] = " "+str(cards[pos,pos2])+" "
+    print(coordinates)
     print(hidden2)
-    b = tuple(input("Choose a position for the second card (ex. (1,2) or (2,2)): "))
  ##########################################################
-    print("You've selected number", cards[b])
-    hidden2.pop(b)
-    hidden2.insert(b, cards[b])
+    pos3 = int(input("Choose a position for the row of the SECOND card: "))
+    pos4 =int(input("Choose a position for the column of the second card: " ))
+    while pos3 > int(len(cards)):
+        print("No se puede usar ese numero, trate otra vez.")
+        pos3 = int(input("Choose a position for the row of the first card: "))
+    while pos4 > int(len(cards[0])):
+        print("No se puede usar ese numero, trate otra vez.")
+        pos4 =int(input("Choose a position for the column of the first card: " ))
+    
+    print("You've selected number", cards[pos3,pos4])
+    hidden2[pos3,pos4] = " "+str(cards[pos3,pos4])+" "
+    print(coordinates)
     print(hidden2)
-    if cards[position] == cards[b]:
-        ganar(player, cards[b], hidden, cards, position,b,player_1, player_2,pairs)
+    if cards[pos, pos2] == cards[pos3, pos4]:
+        ganar(player, cards[pos, pos2], hidden2, cards, pos, pos2, pos3, pos4, p1, p2, pairs, coordinates)
+        
     else:
-        hidden2.remove(cards[position])
-        hidden2.remove(cards[b])
-        hidden2.insert(position, "*")
-        hidden2.insert(b,"*")
+        hidden2[pos,pos2] = " ¿?  "
+        hidden2[pos3,pos4] = " ¿?  "
 
         if player == 1:
             print("   ")
+            print("___________________________________________")
             print("You lost this round, it's 2nd player's turn")
             print("___________________________________________")
             player = 2
-            guessing(player, cards, hidden2, player_1, player_2,pairs)
+            guessing(hidden2, player, cards , p1, p2, pairs, coordinates)
 
         else:
             print("   ")
+            print("___________________________________________")
             print("You lost this round, it's 1st player's turn")
             print("___________________________________________")
             player = 1
-            guessing(player, cards, hidden2 , player_1, player_2,pairs)
-print(cards)
+            guessing(hidden2, player, cards , p1, p2, pairs, coordinates)
+
+
 print("*****1ST PLAYER STARTS********") 
-table(1, cards, player_1, player_2, pairs, hidden)   
+table(1, cards, p1, p2, pairs, hidden)  
