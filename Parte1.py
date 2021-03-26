@@ -89,9 +89,6 @@ def general(hidden,cards, divisor):    #La primera columna de las cartas no cuen
         cards = np.array(cards)
         a = cards[:,0]
         cards = np.insert(cards, ((int(len(hidden)/divisor))), a , axis=1)
-        i = 0
-        for i in range(0,len(cards[0])):
-            cards[0:i] = "null"
 
         return cards,j,coordinates
     
